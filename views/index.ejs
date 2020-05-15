@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+
+    <table border="1" width = "100%">
+        
+      <tr>
+          <th>DELETE</th>
+          <th>EDIT</th>
+          <th>ID</th>
+          <th>NAME</th>
+          <th>MODEL NUMBER</th>
+          <th>SERIES</th>
+          
+      </tr>
+      
+      <% data.forEach(function (item,index) {%>
+          <tr>
+              <td><a href="/delete/<%=item.id%>">DELETE</a></td>
+              <td><a href="/edit/<%=item.id%>">EDIT</a></td>
+              <td><%=item.id%></td>
+              <td><%=item.name%></td>
+              <td><%=item.modelnumber%></td>
+              <td><%=item.series%></td>
+          </tr>
+      <%}) %>
+  </table>
+  </body>
+</html>

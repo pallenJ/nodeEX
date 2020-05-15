@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src = '/socket.io/socket.io.js'></script>
+    <script src = 'https://code.jquery.com/jquery-1.12.4.js'></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+
+        $(function () {
+            $('#go_btn').click(function () {
+                $('#room_form').submit();
+            })
+            $('#old_room').change(function () {
+                $('input[name="room_name"]').val($(this).val());
+                $('#room_form').submit();
+            })
+
+        });
+    </script>
+
+</head>
+<body>
+
+
+    <div class="container">
+        <h1 align='center'>ROOM</h1>
+        <div class="card">    
+    <% if(room_list!='invalid'){%> 
+        <p>기존에 참여한 방</p>
+        <select class="" id ="old_room">
+         <option value="">==선택==</option>   
+        <%room_list.forEach(e=> {%>
+            
+         <option value="<%=e.room%>"><%=e.room%></option>   
+          <%})%>
+       </select>
+<%} %>
+    <form method="POST" id ="room_form" >
+        <p>새로운방</p>
+        <div class="input-group">
+
+            <input type="text" name="room_name" class="form-control" aria-describedby="go_btn" required/>
+            <span class="btn input-group-addon" id = "go_btn"> GO </span>
+        </div>
+
+    </form>
+</div>    
+</div>
+
+
+</body>
+</html>

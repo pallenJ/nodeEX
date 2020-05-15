@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src = '/socket.io/socket.io.js'></script>
+    <script src = 'https://code.jquery.com/jquery-1.12.4.js'></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+
+        $(function () {
+            //방이름 입력
+            //var room = prompt('room name:','')
+            let room = '<%= room_name%>';
+
+            //소켓연결
+            let socket = io.connect();
+            //방입장
+            socket.emit('join', room);
+            $('.h3').text(room);
+            //기존의 채팅 리스트 출력
+            showChatList();
+            $('#chat_board').prepend('<tr class = "bg-white"><th colspan = 100%><%=loginID %>님이 입장했습니다');
+            
+            $('#text').focus();
+            
+            socket.on('message', function (data) {//소켓으로 메세지 추가
+                let message = data +'';
+                let user_id = message.split(':')[0];
+                message = message.substring(user_id.length+1);
+                const d = new Date();
+                //console.log('socket on');
+                
+                showMessageList(user_id,message,d.getFullYear()+"-"+format10(d.getMonth()+1)+"-"+format10(d.getDate())+" "+
+                format10(d.getHours())+":"+format10(d.getMinutes())+":"+format10(d.getSeconds()));
+            })
+            
+            function format10(num) {//두자릿수 포맷을 위한 함수
+                return (num<10?"0":"")+num;
+            }
+
+            $('#button').click (function () {
+                //console.log('btn click');
+                
+                var text = $('#text').val();
+                //socket.emit('rint',text);
+                if(text=='')return;
+                socket.emit('message', '<%=loginID %>'+':'+text);
+                addChat(room,text,'<%=loginID %>');
+               
+                $('#text').val('');
+                $('#text').focus();
+            });
+           $('#text').keydown(function (key) {
+               if(key.keyCode==13){
+                $('#button').click();
+               }
+           })
+           function showChatList() {
+               
+            $.ajax({
+                type : 'post',
+                //async:false,
+                url : '/chat/chatList',
+                data : {room:room},
+                dataType : 'json',
+                error: function(xhr, status, error){
+                    //alert(error);
+                },
+                success : function(data){
+                    
+                    data.forEach(e => {
+                        console.log(e.user_id+":"+e.contents)
+                        showMessageList(e.user_id,e.contents,e.send_date)
+                    });
+                },
+            });
+           }
+           function addChat(room_name,contents,user_id) {//DB에 입력하기위한 함수
+
+            $.ajax({
+            type : 'post',
+            //async:false,
+            url : '/chat/addChat',
+            data : {room:room_name, contents:contents,user_id:user_id},
+            dataType : 'json',
+            error: function(xhr, status, error){
+               alert(error);
+            },
+            success : function(data){
+              // alert(data);
+            },
+        });
+
+           }
+
+        function showMessageList(user_id,message, sendTime) {
+            let classOption = user_id =='<%=loginID%>'?'bg-warning text-primary':'bg-info';
+            let htmlText = '<tr class = "'+classOption+'"><th style = "width:150px;">'+user_id+'<td align="left">'
+                +message+' <td style = "width:200px"><small class = "text-secondary">'+sendTime+'</small>'
+            $('#chat_board').prepend(htmlText);
+        }
+
+        });
+    </script>
+
+</head>
+<body>
+<div class="container">
+    <h1>Chat TEST</h1>
+    <div align = "right"><a class="" href="/chat/chatRoom"> other room </a>  </div>
+    <p class='h3'></p>
+    <div class="input-group">
+        <input type="text" class="form-control" id ="text" aria-describedby = "button">
+        <span class="btn btn-success input-group-addon text-white" id = 'button'>Send</span>
+    </div>
+    <table id ='chat_board' class="table table-info table-hover">
+    </table>
+</div>    
+
+
+
+</body>
+</html>

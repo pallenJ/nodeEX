@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <%if(loginID){ %>
+        <%=loginID+' login'%>
+    <%} %>
+</head>
+<body>
+    <a href="/user/register"><h3>REGISTER</h3></a>
+    <a href="/user/login"><h3>
+        <%=loginID?'LOGOUT':'LOGIN'%>
+        <%if(loginID){%>
+        <h3> <a href="/chat/chatTest"> chatting </a> </h3>  
+        <% } %> 
+    </h3></a>
+</body>
+</html>

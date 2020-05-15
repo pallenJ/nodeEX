@@ -1,0 +1,44 @@
+<script type="text/JavaScript"  src=http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js></script>
+
+<form method="POST">
+    <p id = 'use_MSG' style="color: red;"></p>
+    ID &nbsp; <input type="text" name = 'reg_id' id='reg_id' required><button type="button" id ='id_check'>유효성 검사</button>  <br>
+    PW <input type="password" name = 'reg_pw' required><hr>
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    $(function () {
+        $('#id_check').click(function () {
+            let id =  $('#reg_id').val();
+            if(id == ''){
+                $('#use_MSG').text('아이디를 입력해주세요');
+                return;
+            }
+            $.ajax({
+            type : 'post',
+            async:false,
+            url : '/user/check_id',
+            data : {reg_id:id},
+            dataType : 'json',
+            error: function(xhr, status, error){
+                alert(error);
+            },
+            success : function(data){
+                if(data.data){
+                    $('#use_MSG').attr('style','color:green;')
+                    $('#use_MSG').text('사용가능한 아이디 입니다')
+                }else{
+                    $('#use_MSG').attr('style','color:red;')
+                    $('#use_MSG').text('이미 사용중인 아이디 입니다')
+                }
+            },
+        });
+
+
+        })
+    })
+
+</script>
+
+
