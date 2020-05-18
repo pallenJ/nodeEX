@@ -23,10 +23,11 @@
             let socket = io.connect();
             //방입장
             socket.emit('join', room);
+            socket.emit('message', ':<%=loginID %>님이 입장하셨습니다');
             $('.h3').text(room);
             //기존의 채팅 리스트 출력
             showChatList();
-            $('#chat_board').prepend('<tr class = "bg-white"><th colspan = 100%><%=loginID %>님이 입장했습니다');
+            
             
             $('#text').focus();
             
@@ -57,6 +58,9 @@
                 $('#text').val('');
                 $('#text').focus();
             });
+            $("#other_room").click(function(){
+                socket.emit('message', ':<%=loginID %>님이 퇴장하셨습니다.');
+            });
            $('#text').keydown(function (key) {
                if(key.keyCode==13){
                 $('#button').click();
@@ -79,6 +83,7 @@
                         console.log(e.user_id+":"+e.contents)
                         showMessageList(e.user_id,e.contents,e.send_date)
                     });
+                //    $('#chat_board').prepend('<tr class = "bg-light"><th colspan = "100%"><%=loginID %>님이 입장했습니다');
                 },
             });
            }
@@ -101,20 +106,25 @@
            }
 
         function showMessageList(user_id,message, sendTime) {
-            let classOption = user_id =='<%=loginID%>'?'bg-warning text-primary':'bg-info';
+            let classOption = 'bg-info';
+            if(user_id == ''){
+                classOption = 'bg-white';
+            }else if(user_id =='<%=loginID%>'){
+                classOption = 'bg-warning text-primary';
+            }
             let htmlText = '<tr class = "'+classOption+'"><th style = "width:150px;">'+user_id+'<td align="left">'
                 +message+' <td style = "width:200px"><small class = "text-secondary">'+sendTime+'</small>'
             $('#chat_board').prepend(htmlText);
         }
 
-        });
+    });
     </script>
 
 </head>
 <body>
 <div class="container">
     <h1>Chat TEST</h1>
-    <div align = "right"><a class="" href="/chat/chatRoom"> other room </a>  </div>
+    <div align = "right"><a class="" href="/chat/chatRoom" id="other_room"> other room </a>  </div>
     <p class='h3'></p>
     <div class="input-group">
         <input type="text" class="form-control" id ="text" aria-describedby = "button">
