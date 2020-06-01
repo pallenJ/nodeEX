@@ -1,7 +1,6 @@
 var router = require('express').Router();
 const crypto = require('crypto');
 var userDAO = require('../dao/usersDAO');
-const session = require('express-session');
 
 const cryptoMY =  password => {
 	crypto.randomBytes(64, (err, buf) => {
@@ -58,7 +57,7 @@ router.get("/register", function(req, res) {
           console.log(req.cookies.loginID,' logout');
           res.clearCookie('loginID')
           */
-         console.log(session.loginID,' logout');
+         console.log(req.session.loginID,' logout');
          req.session.loginID = '';
       }
           res.render("user/register");
