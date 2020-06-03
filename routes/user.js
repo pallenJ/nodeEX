@@ -2,13 +2,11 @@ var router = require('express').Router();
 const crypto = require('crypto');
 var userDAO = require('../dao/usersDAO');
 
-const cryptoMY =  password => {
-	crypto.randomBytes(64, (err, buf) => {
-		const salt = buf.toString('base64')
-		crypto.pbkdf2(password, salt, 100, 64, 'sha512', (err, key) =>{
-            console.log(key.toString('base64'));
-		})
-	})
+const cipherMY =  (key,input) =>{
+    var cipher = crypto.createCipher('aes192', key);
+    cipher.update(input, 'utf8', 'base64');
+    var cipheredOutput = cipher.final('base64');
+    return cipheredOutput;
 }
 
 // req로 쓰이는건 login_id, session으로 쓰이는건 loginID
@@ -18,7 +16,7 @@ router.get("/login", function(req, res) {
        
      console.log('req.session:',req.session)
       if(req.session.loginID!=undefined&&req.session.loginID!='undefined'&&req.session.loginID!=''){
-          console.log(session.loginID,' logout')
+          console.log(req.session.loginID,' logout')
           
           req.session.loginID = '';
           /*
@@ -35,8 +33,11 @@ router.post("/login",function (req,res) {
     let id = req.body.login_id;
     let enc_pw =  crypto.createHash('sha512').update(req.body.login_pw).digest('base64');
     userDAO.get_by_id(id,function (data) {
-        console.log(data);
+        
+        console.log( "pbkdf2"+": "+ cipherMY(data.reg_date.toString(),data.password));
+
         if(data.password == enc_pw){
+            console.log(data);
             /*
             res.cookie('loginID',id,{
                 maxAge: 1000*60*60
@@ -52,7 +53,7 @@ router.post("/login",function (req,res) {
 })
 
 router.get("/register", function(req, res) {
-      if(req.session.loginID != ''||req.session.loginID!=undefined||req.session.loginID!='undefined'){
+      if(req.session.loginID != ''&&req.session.loginID!=undefined&&req.session.loginID!='undefined'){
           /*
           console.log(req.cookies.loginID,' logout');
           res.clearCookie('loginID')
